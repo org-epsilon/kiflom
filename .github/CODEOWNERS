@@ -1,0 +1,5 @@
+*                                   @org-epsilon/sm-po1-miguel @org-epsilon/codeowners_(cw)
+/src/                               @org-epsilon/sm-po1-miguel @org-epsilon/codeowners_(cw)
+/docs                               @org-epsilon/sm-po1-miguel @org-epsilon/codeowners_(cw)
+/.github/                           @org-epsilon/codeowners_(cw)
+/docs/rubrica-evaluacion.md         @org-epsilon/codeowners_(cw)
