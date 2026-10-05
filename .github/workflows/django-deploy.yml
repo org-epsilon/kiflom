@@ -1,0 +1,37 @@
+name: Deploy Django - Deportivos Guadalupe
+
+on:
+  push:
+    branches:
+      - workflows/Django
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+      
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Instalar dependencias
+        run: |
+          cd Deportivos_Guadalupe
+          pip install -r requirements.txt
+      
+      - name: Ejecutar migraciones
+        run: |
+          cd Deportivos_Guadalupe
+          python manage.py migrate --noinput
+      
+      - name: Recopilar archivos estáticos
+        run: |
+          cd Deportivos_Guadalupe
+          python manage.py collectstatic --noinput
+      
+      - name: ✅ Build completado correctamente
+        run: echo "Django project built successfully!"
