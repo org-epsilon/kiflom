@@ -1,4 +1,4 @@
-name: Suma de Números
+name: Deploy suma
 
 on:
   push:
@@ -8,17 +8,15 @@ on:
       - workflow/suma
 
 jobs:
-  suma:
+  deploy:
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v5
+        uses: actions/checkout@v3
       
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - name: Deploy a GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          python-version: '3.x'
-      
-      - name: Ejecutar script de suma
-        run: python suma.py
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./

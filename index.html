@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Suma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #00ff00;
+        }
+
+        .container {
+            background-color: #0a0a0a;
+            border: 3px solid #00ff00;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 0 20px #00ff00, inset 0 0 10px rgba(0, 255, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            font-size: 2em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ff00;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a1a1a;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 15px #00ff00;
+            border-color: #00ff00;
+        }
+
+        input::placeholder {
+            color: #00aa00;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px #00ff00;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #00cc00;
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .resultado.mostrar {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resultado h2 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .resultado p {
+            font-size: 1.2em;
+            color: #00ff00;
+        }
+
+        .operacion {
+            color: #00aa00;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ SUMA</h1>
+        
+        <form id="sumaForm">
+            <div class="input-group">
+                <label for="numero1">Primer número:</label>
+                <input 
+                    type="number" 
+                    id="numero1" 
+                    placeholder="Ingresa el primer número"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="numero2">Segundo número:</label>
+                <input 
+                    type="number" 
+                    id="numero2" 
+                    placeholder="Ingresa el segundo número"
+                    required
+                >
+            </div>
+
+            <button type="submit">Calcular Suma</button>
+        </form>
+
+        <div class="resultado" id="resultado">
+            <h2>Resultado:</h2>
+            <p id="respuesta"></p>
+            <div class="operacion" id="operacion"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sumaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Obtener los valores
+            const num1 = parseFloat(document.getElementById('numero1').value);
+            const num2 = parseFloat(document.getElementById('numero2').value);
+
+            // Calcular la suma
+            const suma = num1 + num2;
+
+            // Mostrar el resultado
+            document.getElementById('respuesta').textContent = suma;
+            document.getElementById('operacion').textContent = `${num1} + ${num2} = ${suma}`;
+            document.getElementById('resultado').classList.add('mostrar');
+        });
+    </script>
+</body>
+</html>
