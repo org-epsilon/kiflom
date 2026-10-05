@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if editing %}Editar {{ vehicle.marca }} {{ vehicle.modelo }}{% else %}Añadir vehículo{% endif %} | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=7">
+</head>
+<body class="ag-page catalog-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}"><img src="{% static 'source/images/systems/favicon.ico' %}" alt=""><span>Deportivos Guadalupe</span></a>
+        <nav class="ag-nav" aria-label="Navegación de alta"><a href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Catálogo</a><a href="{% url 'home' %}">Salir</a></nav>
+    </header>
+    <main class="ag-main create-main">
+        <section class="catalog-heading">
+            <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_catalog' %}">← Volver al catálogo</a>
+            <p class="ag-eyebrow">Inventario / {% if editing %}Edición{% else %}Nuevo vehículo{% endif %}</p>
+            <h1>{% if editing %}Editar <span>vehículo</span>{% else %}Añadir <span>vehículo</span>{% endif %}</h1>
+            <p>{% if editing %}Actualiza cualquier dato, medio o especificación de esta ficha.{% else %}Completa la ficha para publicar un nuevo deportivo en el catálogo. Puedes usar archivos locales o enlaces externos.{% endif %}</p>
+        </section>
+        <form class="vehicle-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+            <fieldset><legend>Identidad y disponibilidad</legend>
+                <div class="form-grid form-grid-three">
+                    <label>{{ form.marca.label }}{{ form.marca }}{{ form.marca.errors }}</label>
+                    <label>{{ form.modelo.label }}{{ form.modelo }}{{ form.modelo.errors }}</label>
+                    <label>{{ form.precio.label }}{{ form.precio }}{{ form.precio.errors }}</label>
+                    <label>{{ form.anio.label }}{{ form.anio }}{{ form.anio.errors }}</label>
+                    <label>{{ form.stock.label }}{{ form.stock }}{{ form.stock.errors }}</label>
+                </div>
+            </fieldset>
+            <fieldset><legend>Medios del vehículo</legend>
+                <div class="form-grid form-grid-two">
+                    <label>{{ form.imagen_archivo.label }}{{ form.imagen_archivo }}{{ form.imagen_archivo.errors }}</label>
+                    <label>{{ form.imagen_url.label }}{{ form.imagen_url }}{{ form.imagen_url.errors }}</label>
+                    <label>{{ form.modelo_3d_archivo.label }}{{ form.modelo_3d_archivo }}{{ form.modelo_3d_archivo.errors }}</label>
+                    <label class="form-field-wide">{{ form.modelo_3d_url.label }}{{ form.modelo_3d_url }}{{ form.modelo_3d_url.errors }}</label>
+                    {% if editing %}<label class="form-check">{{ form.limpiar_imagen }}{{ form.limpiar_imagen.label }}</label><label class="form-check">{{ form.limpiar_modelo_3d }}{{ form.limpiar_modelo_3d.label }}</label>{% endif %}
+                </div>
+                <p class="form-note">Pega el código completo que entrega Sketchfab. Se conservará el iframe y su atribución, mientras se bloquea cualquier HTML externo no permitido.</p>
+            </fieldset>
+            <fieldset><legend>Ficha técnica</legend>
+                <div class="form-grid form-grid-two">
+                    <label>{{ form.combustible.label }}{{ form.combustible }}{{ form.combustible.errors }}</label>
+                    <label>{{ form.motor.label }}{{ form.motor }}{{ form.motor.errors }}</label>
+                    <label>{{ form.transmision.label }}{{ form.transmision }}{{ form.transmision.errors }}</label>
+                    <label>{{ form.potencia.label }}{{ form.potencia }}{{ form.potencia.errors }}</label>
+                    <label>{{ form.traccion.label }}{{ form.traccion }}{{ form.traccion.errors }}</label>
+                    <label>{{ form.carroceria.label }}{{ form.carroceria }}{{ form.carroceria.errors }}</label>
+                    <label>{{ form.sillas.label }}{{ form.sillas }}{{ form.sillas.errors }}</label>
+                    <label>{{ form.puertas.label }}{{ form.puertas }}{{ form.puertas.errors }}</label>
+                </div>
+            </fieldset>
+            <fieldset><legend>Descripción</legend>
+                <label>{{ form.descripcion.label }}</label>
+                <div class="rich-editor" data-rich-editor>
+                    <div class="rich-toolbar" role="toolbar" aria-label="Formato de descripción">
+                        <button type="button" data-command="undo" aria-label="Deshacer">↶</button>
+                        <button type="button" data-command="redo" aria-label="Rehacer">↷</button>
+                        <select data-command="formatBlock" aria-label="Estilo de texto">
+                            <option value="p">Texto normal</option>
+                            <option value="h2">Título</option>
+                            <option value="h3">Subtítulo</option>
+                            <option value="blockquote">Cita</option>
+                        </select>
+                        <button type="button" data-command="bold" aria-label="Negrita"><strong>B</strong></button>
+                        <button type="button" data-command="italic" aria-label="Cursiva"><em>I</em></button>
+                        <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
+                        <button type="button" data-command="strikeThrough" aria-label="Tachado"><s>S</s></button>
+                        <button type="button" data-command="superscript" aria-label="Superíndice">x<sup>2</sup></button>
+                        <button type="button" data-command="subscript" aria-label="Subíndice">x<sub>2</sub></button>
+                        <button type="button" data-command="insertUnorderedList" aria-label="Lista">• Lista</button>
+                        <button type="button" data-command="insertOrderedList" aria-label="Lista numerada">1. Lista</button>
+                        <button type="button" data-command="justifyLeft" aria-label="Alinear a la izquierda">≡</button>
+                        <button type="button" data-command="justifyCenter" aria-label="Centrar">≡</button>
+                        <button type="button" data-command="justifyRight" aria-label="Alinear a la derecha">≡</button>
+                        <button type="button" data-command="outdent" aria-label="Reducir sangría">⇤</button>
+                        <button type="button" data-command="indent" aria-label="Aumentar sangría">⇥</button>
+                        <button type="button" data-command="createLink" aria-label="Insertar enlace">🔗</button>
+                        <button type="button" data-command="unlink" aria-label="Quitar enlace">🔗×</button>
+                        <input type="color" data-command="foreColor" value="#61e4ff" aria-label="Color del texto">
+                        <button type="button" data-command="removeFormat" aria-label="Limpiar formato">Tx</button>
+                    </div>
+                    <div class="rich-content" contenteditable="true" role="textbox" aria-multiline="true">{% if description_html %}{{ description_html|safe }}{% else %}{{ form.descripcion.value|default_if_none:"" }}{% endif %}</div>
+                    {{ form.descripcion }}
+                </div>
+                {{ form.descripcion.errors }}
+            </fieldset>
+            <button class="ag-button" type="submit">{% if editing %}Guardar cambios{% else %}Publicar vehículo{% endif %}</button>
+        </form>
+    </main>
+    <script>
+        document.querySelectorAll('[data-rich-editor]').forEach((editor) => {
+            const content = editor.querySelector('.rich-content');
+            const source = editor.querySelector('textarea');
+            editor.querySelectorAll('[data-command]').forEach((button) => {
+                button.addEventListener(button.tagName === 'SELECT' ? 'change' : 'click', () => {
+                    content.focus();
+                    const command = button.dataset.command;
+                    if (command === 'createLink') {
+                        const url = window.prompt('Pega la URL del enlace:');
+                        if (url) document.execCommand(command, false, url);
+                    } else {
+                        document.execCommand(command, false, button.value || null);
+                    }
+                });
+            });
+            editor.closest('form').addEventListener('submit', () => {
+                source.value = content.innerHTML;
+            });
+        });
+    </script>
+</body>
+</html>

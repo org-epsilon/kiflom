@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "nombre": "Sede Principal Guadalupe",
+    "ciudad": "Bogotá",
+    "coordenadas": [4.651, -74.051]
+  },
+  {
+    "id": 2,
+    "nombre": "Taller Express Guadalupe",
+    "ciudad": "Medellín",
+    "coordenadas": [6.244, -75.573]
+  }
+]

@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ brand }} | Catálogo | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=6">
+</head>
+<body class="ag-page catalog-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación del catálogo">
+            <a href="{% url 'app_deportivos_guadalupe:garaje' %}">Garaje</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main catalog-main">
+        <section class="catalog-heading">
+            <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:garaje' %}">← Volver al catálogo</a>
+            <p class="ag-eyebrow">Catálogo / {{ brand }}</p>
+            <h1>{% if all_vehicles %}Todos los <span>vehículos</span>{% else %}Modelos <span>{{ brand }}</span>{% endif %}</h1>
+            <p>Explora la selección disponible y entra en cada ficha para conocer sus especificaciones, rendimiento y experiencia visual.</p>
+            <div class="catalog-actions">
+                <a class="ag-button ag-button-small" href="{% url 'app_deportivos_guadalupe:car_create' %}">Añadir</a>
+                {% if not all_vehicles %}<a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Ver todos los vehículos</a>{% endif %}
+            </div>
+        </section>
+
+        <section class="catalog-filters" aria-labelledby="filter-title">
+            <div class="section-heading"><p class="ag-eyebrow">Filtrar catálogo</p><h2 id="filter-title">Explora por marca</h2></div>
+            <div class="catalog-brand-track">
+                {% for filter_brand in catalog_brands %}
+                    <a class="catalog-brand-filter{% if filter_brand.slug == selected_brand %} is-active{% endif %}" href="{% url 'app_deportivos_guadalupe:car_branch_list' filter_brand.slug %}">{{ filter_brand.name }}</a>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if vehicles %}
+            <section class="vehicle-grid" aria-label="Vehículos {{ brand }}">
+                {% for vehicle in vehicles %}
+                    <a class="vehicle-card" href="{% url 'app_deportivos_guadalupe:car_showcase' vehicle.id %}">
+                        <div class="vehicle-card-image">
+                            {% if vehicle.imagen_archivo %}<img src="{{ vehicle.imagen_archivo.url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}" loading="lazy">{% elif vehicle.imagen_url %}<img src="{{ vehicle.imagen_url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}" loading="lazy">{% endif %}
+                            <span class="vehicle-card-year">{{ vehicle.anio }}</span>
+                        </div>
+                        <div class="vehicle-card-copy">
+                            <p class="ag-eyebrow">{{ vehicle.marca }}</p>
+                            <h2>{{ vehicle.modelo }}</h2>
+                            <div class="vehicle-card-meta"><span>{{ vehicle.motor }}</span><strong>${{ vehicle.precio|floatformat:0 }}</strong></div>
+                            <span class="vehicle-card-link">Ver ficha completa →</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="catalog-empty">
+                <p class="ag-eyebrow">Sin resultados</p>
+                <h2>Aún no hay vehículos disponibles de {{ brand }}.</h2>
+                <a class="ag-button" href="{% url 'app_deportivos_guadalupe:garaje' %}">Explorar otras marcas</a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deportivos Guadalupe | Inicio</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}"><span class="brand-mark"></span>Deportivos Guadalupe</a>
+        <nav class="site-nav" aria-label="Navegación principal">
+            <a href="#experiencia">Experiencia</a>
+            <a class="button" href="{% url 'login' %}">Acceder</a>
+        </nav>
+    </header>
+
+    <main class="home-main" id="experiencia">
+        <section class="home-copy">
+            <p class="eyebrow">Performance / Precision / Presence</p>
+            <h1>La conducción<br><span>empieza aquí.</span></h1>
+            <p>Un espacio digital para explorar vehículos deportivos, gestionar experiencias y entrar al centro de operaciones de Deportivos Guadalupe.</p>
+            <div class="home-actions">
+                <a class="button" href="{% url 'login' %}">Entrar al garaje</a>
+                <a class="button button-secondary" href="{% url 'app_deportivos_guadalupe:features_test' %}">Explorar funciones</a>
+            </div>
+        </section>
+
+        <aside class="home-visual" aria-label="Panel visual de Deportivos Guadalupe">
+            <span class="visual-label">Est. 2026 / Bogotá</span>
+        </aside>
+    </main>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Mapa Operativo | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=5">
+    <link rel="stylesheet" href="{% static 'source/libs/leaflet/leaflet.css' %}">
+</head>
+<body class="ag-page ft-page map-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación del mapa">
+            <a href="{% url 'app_deportivos_guadalupe:feat_soliadds' %}">Solicitudes</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main ft-main">
+        <section class="ft-heading map-heading">
+            <p class="ag-eyebrow">Estas funciones experimentales se encuantran en fase de pruebas, y están sujetas a cambios</p>
+            <div class="map-title-row">
+                <h4 class="map-page-title">Funciones Experimentales <span>del Mapa</span></h4>
+                <button class="map-functions-toggle" id="map-functions-toggle" type="button" aria-expanded="false" aria-controls="map-functions-menu">Abrir funciones</button>
+            </div>
+            <div class="map-functions-menu" id="map-functions-menu" hidden>
+                <button type="button" data-map-action="location">Ingresar Ubicación</button>
+                <button type="button" data-map-action="manual">Añadir Ubicación Manualmente</button>
+                <button type="button" data-map-action="route">Generar Trayectorias</button>
+                <button type="button" data-map-action="view">Ver Ubicaciones</button>
+            </div>
+            <p>Gestiona ubicaciones y crea trayectorias ajustadas a las calles desde una única vista operativa.</p>
+        </section>
+
+        <section class="map-workspace" aria-label="Área de trabajo del mapa">
+            <div class="map-function-panel" id="location-panel" hidden>
+                <div class="map-panel-heading"><div><p class="ag-eyebrow" id="location-mode-label">Nueva ubicación</p><h2 id="location-panel-title">Ingresar ubicación</h2></div><button class="map-close-button" type="button" data-close-panel="location" aria-label="Cerrar panel">×</button></div>
+                <p class="map-help" id="location-help">Escribe una dirección y el mapa ubicará el punto exacto.</p>
+                <form id="location-form" class="map-form" novalidate>
+                    <input id="location-id" type="hidden">
+                    <label>Nombre del punto<input id="location-name" type="text" maxlength="100" required></label>
+                    <label>Descripción<textarea id="location-description" rows="2" maxlength="500"></textarea></label>
+                    <label>Tamaño de sede<select id="location-size" required><option value="pequena">Pequeña</option><option value="mediana">Mediana</option><option value="grande">Grande</option></select></label>
+                    <label>Dirección<input id="location-address" type="text" maxlength="255" required></label>
+                    <div class="map-coordinates"><label>Latitud<input id="location-latitude" type="number" step="0.000001" required></label><label>Longitud<input id="location-longitude" type="number" step="0.000001" required></label></div>
+                    <button class="ag-button" type="submit" id="location-submit">Guardar ubicación</button>
+                </form>
+            </div>
+
+            <div class="map-function-panel route-panel" id="route-panel" hidden>
+                <div class="map-panel-heading"><div><p class="ag-eyebrow">Trazado por calles</p><h2>Generar trayectoria</h2></div><button class="map-close-button" type="button" data-close-panel="route" aria-label="Cerrar panel">×</button></div>
+                <p class="map-help">Inicia la ruta, escribe un nombre y haz clic en el mapa tantas veces como necesites.</p>
+                <div class="route-controls"><button class="route-start-button" id="route-start" type="button">Iniciar ruta</button><input id="route-name" type="text" maxlength="120" placeholder="Nombre de la ruta" hidden><button class="route-finish-button" id="route-finish" type="button" hidden>Finalizar ruta</button></div>
+                <p id="route-status" class="map-status" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="map-function-panel view-panel" id="view-panel" hidden>
+                <div class="map-panel-heading"><div><p class="ag-eyebrow">Consulta persistente</p><h2>Ver ubicaciones y rutas</h2></div><button class="map-close-button" type="button" data-close-panel="view" aria-label="Cerrar panel">×</button></div>
+                <div class="view-tabs"><button class="view-tab is-active" type="button" data-view="locations">Ver Ubicaciones</button><button class="view-tab" type="button" data-view="routes">Ver Rutas</button></div>
+                <div id="locations-table" class="map-table-wrap"></div><div id="routes-table" class="map-table-wrap" hidden></div>
+            </div>
+
+            <p id="map-status" class="map-status" role="status" aria-live="polite"></p>
+            <div id="mapa" class="mapa-interactivo" aria-label="Mapa interactivo de ubicaciones y rutas"></div>
+        </section>
+    </main>
+
+    <script src="{% static 'source/libs/leaflet/leaflet.js' %}"></script>
+    <script src="{% static 'source/scripts/punto_encuentro.js' %}"></script>
+    <script src="{% static 'source/scripts/mapa_operativo.js' %}?v=5"></script>
+</body>
+</html>

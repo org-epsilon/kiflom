@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes de Adición | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=2">
+</head>
+<body class="ag-page ft-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación de solicitudes">
+            <a href="{% url 'app_deportivos_guadalupe:feat_map' %}">Mapa Operativo</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main ft-main">
+        <section class="ft-heading">
+            <p class="ag-eyebrow">Funciones experimentales / Solicitudes 02</p>
+            <h1>Solicitudes <span>de Adición</span></h1>
+            <p>Registra nuevos reportes multimedia para ampliar el inventario de Deportivos Guadalupe.</p>
+        </section>
+
+        <section class="ft-panel ft-form-panel">
+            <h2>Nuevo reporte</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="ag-button" type="submit">Enviar solicitud</button>
+            </form>
+        </section>
+
+        <section class="ft-panel">
+            <h2>Solicitudes recibidas</h2>
+            <div class="ft-reports">
+                {% for r in reportes %}
+                <article class="ft-report">
+                    <img src="{{ r.foto.url }}" width="150" alt="Foto de {{ r.nombre }}">
+                    <div>
+                        <h3>{{ r.nombre }}</h3>
+                        <p>{{ r.descripcion }}</p>
+                        <time datetime="{{ r.fecha|date:'c' }}">{{ r.fecha|date:"d/m/y H:i" }}</time>
+                        {% if r.documento %}<a href="{{ r.documento.url }}">Ver documento</a>{% endif %}
+                    </div>
+                </article>
+                {% empty %}
+                <p class="ft-muted">Aún no hay solicitudes registradas.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

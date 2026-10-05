@@ -1,0 +1,8 @@
+{
+  "name": "Deportivos Guadalupe App",
+  "short_name": "Guadalupe",
+  "start_url": "/",
+  "background_color": "#111111",
+  "theme_color": "#e63946",
+  "display": "standalone"
+}

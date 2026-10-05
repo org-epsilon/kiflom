@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deportivos Guadalupe | Garaje</title>
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'source/libs/leaflet/leaflet.css' %}">
+</head>
+<body class="ag-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'home' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación del garaje">
+            <div class="ag-experimental">
+                <button class="ag-experimental-toggle" type="button" aria-expanded="false" aria-controls="menu-experimental">Funciones Experimentales</button>
+                <div class="ag-experimental-menu" id="menu-experimental">
+                    <button class="ag-experimental-option" type="button" data-url="{% url 'app_deportivos_guadalupe:feat_map' %}">Mapa Operativo</button>
+                    <button class="ag-experimental-option" type="button" data-url="{% url 'app_deportivos_guadalupe:feat_soliadds' %}">Solicitudes de Adición</button>
+                    <button class="ag-experimental-option" type="button">Transferencia</button>
+                    <button class="ag-experimental-option" type="button">Vitrina Multimedia</button>
+                </div>
+            </div>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main">
+        <section class="ag-hero">
+            <div class="ag-hero-copy">
+                <p class="ag-eyebrow">Centro de operaciones / 01</p>
+                <h1>El garaje<br><span>está abierto.</span></h1>
+                <p>Administra la vitrina multimedia, consulta rutas y accede a las herramientas operativas de Deportivos Guadalupe desde un solo lugar.</p>
+                <div class="ag-actions">
+                    <a class="ag-button" href="{% url 'app_deportivos_guadalupe:feat_map' %}">Abrir funciones</a>
+                    <a class="ag-text-link" href="#media">Ver medios</a>
+                </div>
+            </div>
+            <aside class="ag-visual" aria-label="Panel visual del garaje">
+                <span class="ag-visual-label">Performance division / 2026</span>
+            </aside>
+        </section>
+
+        <section class="ag-brands-section" aria-labelledby="marcas-title">
+            <div class="ag-brands-heading">
+                <div>
+                    <p class="ag-eyebrow">Catálogo / Selección</p>
+                    <h2 id="marcas-title">Marcas destacadas</h2>
+                </div>
+                <a class="ag-button ag-button-small" href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Ver Todo</a>
+            </div>
+            <div class="ag-brand-rail">
+                <div class="ag-brand-track" id="marcas-track" aria-label="Marcas de vehículos">
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/apollo.png' %}" alt="Apollo"><span>Apollo</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/aston_martin.png' %}" alt="Aston Martin"><span>Aston Martin</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/audi.png' %}" alt="Audi"><span>Audi</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/bentley.png' %}" alt="Bentley"><span>Bentley</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/bmw.png' %}" alt="BMW"><span>BMW</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/bugatti.png' %}" alt="Bugatti"><span>Bugatti</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/chevrolet.png' %}" alt="Chevrolet"><span>Chevrolet</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/citroen.png' %}" alt="Citroen"><span>Citroen</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/corvette .png' %}" alt="Corvette"><span>Corvette</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/dodge.jpg' %}" alt="Dodge"><span>Dodge</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/ferrari.jpg' %}" alt="Ferrari"><span>Ferrari</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/ford.png' %}" alt="Ford"><span>Ford</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/gumpert.png' %}" alt="Gumpert"><span>Gumpert</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/honda.png' %}" alt="Honda"><span>Honda</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/hyundai.png' %}" alt="Hyundai"><span>Hyundai</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/infinity.png' %}" alt="Infinity"><span>Infinity</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/jaguar.png' %}" alt="Jaguar"><span>Jaguar</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/jeep.png' %}" alt="Jeep"><span>Jeep</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/kia.png' %}" alt="Kia"><span>Kia</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/koenigsegg.png' %}" alt="Koenigsegg"><span>Koenigsegg</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/lamborghini.png' %}" alt="Lamborghini"><span>Lamborghini</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/lexus.png' %}" alt="Lexus"><span>Lexus</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/maserati.png' %}" alt="Maserati"><span>Maserati</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/mazda.png' %}" alt="Mazda"><span>Mazda</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/mclaren.png' %}" alt="McLaren"><span>McLaren</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/mercedes-benz.png' %}" alt="Mercedes-Benz"><span>Mercedes-Benz</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/mitsubishi.png' %}" alt="Mitsubishi"><span>Mitsubishi</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/nissan.png' %}" alt="Nissan"><span>Nissan</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/opel.png' %}" alt="Opel"><span>Opel</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/pagani.png' %}" alt="Pagani"><span>Pagani</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/porsche.png' %}" alt="Porsche"><span>Porsche</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/renault.png' %}" alt="Renault"><span>Renault</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/Rimac.png' %}" alt="Rimac"><span>Rimac</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/rolls royce.png' %}" alt="Rolls Royce"><span>Rolls Royce</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/ssc_tuatara.png' %}" alt="SSC Tuatara"><span>SSC Tuatara</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/subaru.png' %}" alt="Subaru"><span>Subaru</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/tesla.png' %}" alt="Tesla"><span>Tesla</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/Toyota.png' %}" alt="Toyota"><span>Toyota</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/volkswagen.png' %}" alt="Volkswagen"><span>Volkswagen</span></button>
+                    <button class="ag-brand-button" type="button"><img src="{% static 'source/images/libs/leaflet/images/xiaomi.png' %}" alt="Xiaomi"><span>Xiaomi</span></button>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="herramientas">
+            <div class="ag-section-heading">
+                <h2 id="herramientas">Herramientas activas</h2>
+                <span class="ag-eyebrow">Live system</span>
+            </div>
+            <div class="ag-grid">
+                <a class="ag-card" href="{% url 'app_deportivos_guadalupe:feat_map' %}">
+                    <strong>Mapa operativo</strong>
+                    <p>Explora sedes y crea puntos de encuentro sobre el mapa interactivo.</p>
+                </a>
+                <a class="ag-card" href="#media">
+                    <strong>Vitrina multimedia</strong>
+                    <p>Reproduce el contenido de audio y video de la división de alto rendimiento.</p>
+                </a>
+                <a class="ag-card" href="{% url 'getpost_rider' %}">
+                    <strong>Transferencia</strong>
+                    <p>Prueba el flujo de intercambio de datos entre el cliente y el servidor.</p>
+                </a>
+            </div>
+        </section>
+
+        <section id="media" aria-labelledby="media-title">
+            <div class="ag-section-heading">
+                <h2 id="media-title">Vitrina multimedia</h2>
+                <span class="ag-eyebrow">Sound / Motion</span>
+            </div>
+            <div class="ag-media">
+                <div class="ag-panel">
+                    <h3>Pruebas de pista</h3>
+                    <video controls>
+                        <source src="{% static 'source/videos/clips/KOENIGSEGG_CCGT1_premiere.mp4' %}" type="video/mp4">
+                        <track src="{% static 'source/videos/subtitles/[Spanish_(United States)_(auto-generated)]_KOENIGSEGG_CCGT1_World_Premiere.vtt' %}" kind="subtitles" srclang="es" label="Español" default>
+                        Tu navegador no soporta video HTML5.
+                    </video>
+                </div>
+                <div class="ag-panel">
+                    <h3>Sonido de arranque</h3>
+                    <p>Una muestra de la identidad sonora de la colección.</p>
+                    <audio controls>
+                        <source src="{% static 'source/audios/start/muscle_car_arragement.wav' %}" type="audio/wav">
+                        Tu navegador no soporta audio HTML5.
+                    </audio>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const experimentalMenu = document.querySelector('.ag-experimental');
+        const experimentalToggle = document.querySelector('.ag-experimental-toggle');
+
+        experimentalToggle.addEventListener('click', () => {
+            const isOpen = experimentalMenu.classList.toggle('is-open');
+            experimentalToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', event => {
+            if (!experimentalMenu.contains(event.target)) {
+                experimentalMenu.classList.remove('is-open');
+                experimentalToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.querySelectorAll('.ag-experimental-option[data-url]').forEach(option => {
+            option.addEventListener('click', () => {
+                window.location.href = option.dataset.url;
+            });
+        });
+
+        const brandBranchUrl = "{% url 'app_deportivos_guadalupe:car_branch_list' 'marca-placeholder' %}";
+        document.querySelectorAll('.ag-brand-button').forEach(brandButton => {
+            brandButton.addEventListener('click', () => {
+                const brand = brandButton.querySelector('span').textContent.trim();
+                const brandSlug = brand.toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                window.location.href = brandBranchUrl.replace('marca-placeholder', brandSlug);
+            });
+        });
+    </script>
+</body>
+</html>

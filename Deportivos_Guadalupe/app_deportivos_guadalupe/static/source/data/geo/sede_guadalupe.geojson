@@ -1,0 +1,12 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[
+      [-74.05, 4.65], [-74.04, 4.65], [-74.04, 4.64], [-74.05, 4.64], [-74.05, 4.65]
+    ]]
+  },
+  "properties": {
+    "nombre": "Perímetro Showroom Deportivos Guadalupe"
+  }
+}

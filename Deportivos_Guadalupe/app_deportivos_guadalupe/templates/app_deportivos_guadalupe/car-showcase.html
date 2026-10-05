@@ -1,0 +1,72 @@
+{% load static vehicle_extras %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vehicle.marca }} {{ vehicle.modelo }} | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'source/styles/style.css' %}?v=6">
+</head>
+<body class="ag-page showcase-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación del vehículo">
+            <a href="{% url 'app_deportivos_guadalupe:car_edit' vehicle.id %}">Editar</a>
+            <a href="{% url 'app_deportivos_guadalupe:car_branch_list' vehicle.marca|slugify %}">Más {{ vehicle.marca }}</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main showcase-main">
+        <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_branch_list' vehicle.marca|slugify %}">← Volver a {{ vehicle.marca }}</a>
+        <section class="showcase-hero">
+            <div class="showcase-heading">
+                <p class="ag-eyebrow">{{ vehicle.marca }} / {{ vehicle.anio }}</p>
+                <h1>{{ vehicle.modelo }}</h1>
+                <p class="showcase-price"><span>Precio:</span> ${{ vehicle.precio|thousands_dot }} <small>USD</small></p>
+            </div>
+            <div class="showcase-media">
+                {% if vehicle.imagen_archivo %}<img src="{{ vehicle.imagen_archivo.url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}">{% elif vehicle.imagen_url %}<img src="{{ vehicle.imagen_url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}">{% endif %}
+                <span class="showcase-badge">Disponible · {{ vehicle.stock }} unidad{{ vehicle.stock|pluralize:"es" }}</span>
+            </div>
+            <div class="showcase-intro">
+                <div class="showcase-description">{{ description_html|safe }}</div>
+            </div>
+        </section>
+
+        <section class="showcase-specs" aria-labelledby="specs-title">
+            <div class="section-heading"><p class="ag-eyebrow" id="specs-title">Ficha técnica</p></div>
+            <div class="spec-grid">
+                <div><span>Combustible</span><strong>{{ vehicle.combustible }}</strong></div>
+                <div><span>Motor</span><strong>{{ vehicle.motor }}</strong></div>
+                <div><span>Transmisión</span><strong>{{ vehicle.transmision }}</strong></div>
+                <div><span>Potencia / velocidad</span><strong>{{ vehicle.potencia }}</strong></div>
+                <div><span>Tracción</span><strong>{{ vehicle.traccion }}</strong></div>
+                <div><span>Carrocería</span><strong>{{ vehicle.carroceria }}</strong></div>
+                <div><span>Sillas</span><strong>{{ vehicle.sillas }}</strong></div>
+                <div><span>Puertas</span><strong>{{ vehicle.puertas }}</strong></div>
+            </div>
+        </section>
+
+        {% if vehicle.modelo_3d_embed_html %}
+            <section class="showcase-3d" aria-labelledby="model-title">
+                <div class="section-heading"><p class="ag-eyebrow">Experiencia inmersiva</p><h2 id="model-title">Explora el modelo en 3D</h2></div>
+                <div class="modelo-3d-container">{{ vehicle.modelo_3d_embed_html|safe }}</div>
+            </section>
+        {% endif %}
+        {% if vehicle.modelo_3d_url and not vehicle.modelo_3d_embed_html %}
+            <section class="showcase-3d" aria-labelledby="model-title">
+                <div class="section-heading"><p class="ag-eyebrow">Experiencia inmersiva</p><h2 id="model-title">Explora el modelo en 3D</h2></div>
+                <div class="modelo-3d-container"><iframe title="Modelo 3D de {{ vehicle.marca }} {{ vehicle.modelo }}" src="{{ vehicle.modelo_3d_url }}" frameborder="0" allowfullscreen allow="autoplay; fullscreen; xr-spatial-tracking"></iframe></div>
+            </section>
+        {% endif %}
+        {% if vehicle.modelo_3d_archivo %}
+            <p class="model-download"><a class="ag-text-link" href="{{ vehicle.modelo_3d_archivo.url }}" download>Descargar modelo 3D GLB →</a></p>
+        {% endif %}
+    </main>
+</body>
+</html>

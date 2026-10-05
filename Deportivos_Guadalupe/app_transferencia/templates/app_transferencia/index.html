@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeRider | Transferencia</title>
+    <link rel="stylesheet" href="{% static 'styles/app_transferencia.css' %}">
+    
+    <body class="at-page">
+        <header class="at-header">
+            <a class="at-brand" href="{% url 'home' %}">Deportivos Guadalupe</a>
+            <nav class="at-nav" aria-label="Navegación de transferencia">
+                <a href="{% url 'app_deportivos_guadalupe:garaje' %}">Garaje</a>
+                <a href="{% url 'home' %}">Inicio</a>
+            </nav>
+        </header>
+        
+        <main class="at-main">
+            <section class="at-intro">
+                <p class="at-eyebrow">Data link / Utility 02</p>
+                <h1>Transferencia<br><span>de datos.</span></h1>
+                <p>Una herramienta de prueba para observar cómo viaja la información entre el navegador y el servidor.</p>
+            </section>
+            <div class="at-grid">
+                <section class="at-card">
+                    <h2>Enviar por GET</h2>
+                    <form method="GET">
+                        <input type="text" name="dato" placeholder="Escribe un dato" required>
+                        <button class="at-button" type="submit">Enviar GET</button>
+                    </form>
+                </section>
+                <section class="at-card">
+                    <h2>Enviar por POST</h2>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="text" name="dato" placeholder="Escribe un dato" required>
+                        <button class="at-button" type="submit">Enviar POST</button>
+                    </form>
+                </section>
+            </div>
+            
+            <section class="at-card at-result">
+                <h2>Resultado</h2>
+                {% if resultado %}
+                    <strong>{{ resultado }}</strong>
+                    <p>Dato recibido: {{ dato }} | Método: {{ metodo }}</p>
+                {% else %}
+                    <p>Aquí aparecerá el resultado de la última transferencia.</p>
+                {% endif %}
+            </section>
+        </main>
+    </body>
+</html>
