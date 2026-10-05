@@ -1,0 +1,2 @@
+def laka (x):
+    pass
