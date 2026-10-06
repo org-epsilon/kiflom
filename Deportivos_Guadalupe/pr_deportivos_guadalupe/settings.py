@@ -123,7 +123,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'app_deportivos_guadalupe', 'static'),
+    os.path.join(BASE_DIR, 'pr_deportivos_guadalupe', 'static'),   # Login/Home
+    os.path.join(BASE_DIR, 'app_deportivos_guadalupe', 'static'),  # App deportivos
+    os.path.join(BASE_DIR, 'app_transferencia', 'static'),         # App transferencia 
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
