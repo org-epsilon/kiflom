@@ -2,7 +2,7 @@ services:
   - type: web
     name: deportivos-guadalupe
     runtime: python312
-    buildCommand: pip install -r Deportivos_Guadalupe/requirements.txt && cd Deportivos_Guadalupe && python manage.py migrate
+    buildCommand: cd Deportivos_Guadalupe && pip install -r requirements.txt && python manage.py migrate
     startCommand: cd Deportivos_Guadalupe && gunicorn pr_deportivos_guadalupe.wsgi:application
     envVars:
       - key: PYTHON_VERSION
