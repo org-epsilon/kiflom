@@ -189,4 +189,60 @@ class VehiculoCatalogoTests(TestCase):
         vehicle = Vehiculo.objects.get(marca='BMW', modelo='M4 Competition')
         self.assertIn('<br><br>', vehicle.descripcion)
 
-# Create your tests here.
+    def test_create_and_edit_vehicle_with_extra_carousel_images(self):
+        # 1. Crear vehículo con imágenes extra
+        response = self.client.post(
+            reverse('app_deportivos_guadalupe:car_create'),
+            {
+                'marca': 'McLaren',
+                'modelo': '720S',
+                'precio': '310000',
+                'anio': '2024',
+                'stock': '2',
+                'sillas': '2',
+                'puertas': '2',
+                'imagen_url': 'https://example.com/mclaren-front.jpg',
+                'imagenes_extra': [
+                    'https://example.com/mclaren-side.jpg',
+                    'https://example.com/mclaren-interior.jpg',
+                ],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        vehicle = Vehiculo.objects.get(marca='McLaren', modelo='720S')
+        self.assertEqual(vehicle.imagenes.count(), 2)
+
+        # 2. Verificar que la vista de showcase renderiza el carrusel con las imágenes de la galería
+        showcase = self.client.get(
+            reverse('app_deportivos_guadalupe:car_showcase', args=[vehicle.id])
+        )
+        self.assertEqual(showcase.status_code, 200)
+        self.assertContains(showcase, 'showcase-gallery')
+        self.assertContains(showcase, 'showcase-carousel')
+        self.assertContains(showcase, 'https://example.com/mclaren-front.jpg')
+        self.assertContains(showcase, 'https://example.com/mclaren-side.jpg')
+        self.assertContains(showcase, 'https://example.com/mclaren-interior.jpg')
+        self.assertEqual(len(showcase.context['imagenes_galeria']), 2)
+
+
+        # 3. Editar vehículo y actualizar imágenes extra
+        edit_response = self.client.post(
+            reverse('app_deportivos_guadalupe:car_edit', args=[vehicle.id]),
+            {
+                'marca': 'McLaren',
+                'modelo': '720S',
+                'precio': '310000',
+                'anio': '2024',
+                'stock': '2',
+                'sillas': '2',
+                'puertas': '2',
+                'imagen_url': 'https://example.com/mclaren-front.jpg',
+                'imagenes_extra': [
+                    'https://example.com/mclaren-rear.jpg',
+                ],
+            },
+        )
+        self.assertEqual(edit_response.status_code, 302)
+        self.assertEqual(vehicle.imagenes.count(), 1)
+        self.assertEqual(vehicle.imagenes.first().url, 'https://example.com/mclaren-rear.jpg')
+

@@ -38,6 +38,23 @@
                     <label>{{ form.imagen_url.label }}{{ form.imagen_url }}{{ form.imagen_url.errors }}</label>
                     <label>{{ form.modelo_3d_archivo.label }}{{ form.modelo_3d_archivo }}{{ form.modelo_3d_archivo.errors }}</label>
                     <label class="form-field-wide">{{ form.modelo_3d_url.label }}{{ form.modelo_3d_url }}{{ form.modelo_3d_url.errors }}</label>
+                    <div class="form-field-wide extra-images-section">
+                        <div class="extra-images-header">
+                            <div>
+                                <span class="extra-images-title">Imágenes adicionales para el carrusel (URLs)</span>
+                                <p class="form-note">Añade enlaces externos de fotos para la galería interactiva del vehículo.</p>
+                            </div>
+                            <button type="button" class="ag-button ag-button-small" id="btn-add-image">+ Añadir URL</button>
+                        </div>
+                        <div id="imagenes-extra-container" class="extra-images-list">
+                            {% for img in imagenes_extra %}
+                                <div class="extra-image-row">
+                                    <input type="url" name="imagenes_extra" value="{{ img.url }}" placeholder="https://ejemplo.com/foto.jpg" maxlength="500">
+                                    <button type="button" class="btn-remove-row" title="Eliminar imagen" aria-label="Eliminar imagen">×</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% if editing %}<label class="form-check">{{ form.limpiar_imagen }}{{ form.limpiar_imagen.label }}</label><label class="form-check">{{ form.limpiar_modelo_3d }}{{ form.limpiar_modelo_3d.label }}</label>{% endif %}
                 </div>
                 <p class="form-note">Pega el código completo que entrega Sketchfab. Se conservará el iframe y su atribución, mientras se bloquea cualquier HTML externo no permitido.</p>
@@ -112,6 +129,31 @@
                 source.value = content.innerHTML;
             });
         });
+
+        // Gestión dinámica de URLs para el carrusel
+        const addImageBtn = document.getElementById('btn-add-image');
+        const imagesContainer = document.getElementById('imagenes-extra-container');
+        if (addImageBtn && imagesContainer) {
+            addImageBtn.addEventListener('click', () => {
+                const row = document.createElement('div');
+                row.className = 'extra-image-row';
+                row.innerHTML = `
+                    <input type="url" name="imagenes_extra" placeholder="https://ejemplo.com/foto.jpg" maxlength="500">
+                    <button type="button" class="btn-remove-row" title="Eliminar imagen" aria-label="Eliminar imagen">×</button>
+                `;
+                imagesContainer.appendChild(row);
+                const input = row.querySelector('input');
+                if (input) input.focus();
+            });
+
+            imagesContainer.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.btn-remove-row');
+                if (removeBtn) {
+                    const row = removeBtn.closest('.extra-image-row');
+                    if (row) row.remove();
+                }
+            });
+        }
     </script>
 </body>
 </html>

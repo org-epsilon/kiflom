@@ -6,8 +6,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
-from .models import Reporte, Trayectoria, Ubicacion, Vehiculo
+from .models import ImagenVehiculo, Reporte, Trayectoria, Ubicacion, Vehiculo
 from .forms import ReporteForm, VehiculoForm, sanitize_description
+
 
 
 CATALOG_BRANDS = [
@@ -47,6 +48,9 @@ def car_create_view(request):
         form = VehiculoForm(request.POST, request.FILES)
         if form.is_valid():
             vehicle = form.save()
+            urls_extra = [u.strip() for u in request.POST.getlist('imagenes_extra') if u.strip()]
+            for orden, url in enumerate(urls_extra):
+                ImagenVehiculo.objects.create(vehiculo=vehicle, url=url, orden=orden)
             return redirect('app_deportivos_guadalupe:car_showcase', car_id=vehicle.id)
     else:
         form = VehiculoForm()
@@ -59,6 +63,10 @@ def car_edit_view(request, car_id):
         form = VehiculoForm(request.POST, request.FILES, instance=vehicle)
         if form.is_valid():
             vehicle = form.save()
+            vehicle.imagenes.all().delete()
+            urls_extra = [u.strip() for u in request.POST.getlist('imagenes_extra') if u.strip()]
+            for orden, url in enumerate(urls_extra):
+                ImagenVehiculo.objects.create(vehiculo=vehicle, url=url, orden=orden)
             return redirect('app_deportivos_guadalupe:car_showcase', car_id=vehicle.id)
     else:
         form = VehiculoForm(instance=vehicle)
@@ -67,15 +75,21 @@ def car_edit_view(request, car_id):
         'editing': True,
         'vehicle': vehicle,
         'description_html': sanitize_description(vehicle.descripcion),
+        'imagenes_extra': vehicle.imagenes.all(),
     })
 
 
 def car_showcase_view(request, car_id):
     vehicle = get_object_or_404(Vehiculo, pk=car_id, disponible=True)
+    imagenes_galeria = [img.url for img in vehicle.imagenes.all() if img.url]
+
     return render(request, 'app_deportivos_guadalupe/car-showcase.html', {
         'vehicle': vehicle,
+        'imagenes_galeria': imagenes_galeria,
         'description_html': sanitize_description(vehicle.descripcion),
     })
+
+
 
 def mapa_view(request):
     return render(request, 'app_deportivos_guadalupe/features-test-maps.html')
