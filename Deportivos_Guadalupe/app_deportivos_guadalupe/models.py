@@ -82,3 +82,15 @@ class Vehiculo(models.Model):
 
     def __str__(self):
         return f'{self.marca} {self.modelo}'
+
+
+class ImagenVehiculo(models.Model):
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, related_name='imagenes')
+    url = models.URLField(max_length=500)
+    orden = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return f'Imagen {self.orden} de {self.vehiculo}'
