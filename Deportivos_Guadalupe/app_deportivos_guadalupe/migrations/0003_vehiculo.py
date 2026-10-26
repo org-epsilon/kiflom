@@ -3,6 +3,7 @@ from django.db import migrations, models
 
 def seed_vehicles(apps, schema_editor):
     Vehiculo = apps.get_model('app_deportivos_guadalupe', 'Vehiculo')
+    database_alias = schema_editor.connection.alias
     vehicles = [
         {
             'marca': 'Porsche', 'modelo': '911 GT3 RS', 'precio': '220000', 'anio': 2024,
@@ -38,7 +39,7 @@ def seed_vehicles(apps, schema_editor):
         },
     ]
     for vehicle in vehicles:
-        Vehiculo.objects.create(**vehicle)
+        Vehiculo.objects.using(database_alias).create(**vehicle)
 
 
 class Migration(migrations.Migration):
