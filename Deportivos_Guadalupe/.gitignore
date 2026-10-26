@@ -20,3 +20,5 @@ __pycache__/
 # Archivos de sistema y entorno
 .DS_Store
 .env
+.env.*
+!.env.example

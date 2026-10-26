@@ -20,10 +20,12 @@
                 <div class="ag-experimental-menu" id="menu-experimental">
                     <button class="ag-experimental-option" type="button" data-url="{% url 'app_deportivos_guadalupe:feat_map' %}">Mapa Operativo</button>
                     <button class="ag-experimental-option" type="button" data-url="{% url 'app_deportivos_guadalupe:feat_soliadds' %}">Solicitudes de Adición</button>
+                    <button class="ag-experimental-option" type="button" data-url="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">Historial Multi-BD</button>
                     <button class="ag-experimental-option" type="button">Transferencia</button>
                     <button class="ag-experimental-option" type="button">Vitrina Multimedia</button>
                 </div>
             </div>
+            <a href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Catálogo</a>
             <a href="{% url 'home' %}">Salir</a>
         </nav>
     </header>
@@ -108,13 +110,17 @@
                     <strong>Mapa operativo</strong>
                     <p>Explora sedes y crea puntos de encuentro sobre el mapa interactivo.</p>
                 </a>
-                <a class="ag-card" href="#media">
-                    <strong>Vitrina multimedia</strong>
-                    <p>Reproduce el contenido de audio y video de la división de alto rendimiento.</p>
+                <a class="ag-card" href="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">
+                    <strong>Historial Multi-BD</strong>
+                    <p>Monitorea la sincronización en tiempo real entre SQLite, PostgreSQL, MySQL y MongoDB.</p>
                 </a>
                 <a class="ag-card" href="{% url 'getpost_rider' %}">
                     <strong>Transferencia</strong>
                     <p>Prueba el flujo de intercambio de datos entre el cliente y el servidor.</p>
+                </a>
+                <a class="ag-card" href="#media">
+                    <strong>Vitrina multimedia</strong>
+                    <p>Reproduce el contenido de audio y video de la división de alto rendimiento.</p>
                 </a>
             </div>
         </section>

@@ -1,14 +1,15 @@
 import json
 from decimal import Decimal, InvalidOperation
 
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
-from .models import ImagenVehiculo, Reporte, Trayectoria, Ubicacion, Vehiculo
+from .models import ImagenVehiculo, Reporte, Trayectoria, Ubicacion, Vehiculo, RegistroAuditoria
 from .forms import ReporteForm, VehiculoForm, sanitize_description
-
+from .sync_service import get_database_status, save_vehicle_with_route, replicate_vehicle_to_all
 
 
 CATALOG_BRANDS = [
@@ -51,10 +52,24 @@ def car_create_view(request):
             urls_extra = [u.strip() for u in request.POST.getlist('imagenes_extra') if u.strip()]
             for orden, url in enumerate(urls_extra):
                 ImagenVehiculo.objects.create(vehiculo=vehicle, url=url, orden=orden)
+
+            target_engine = request.POST.get('target_engine', 'default')
+            route_res = save_vehicle_with_route(vehicle, target_engine, action='CREAR')
+            if route_res.get('status') == 'success':
+                messages.success(request, f'Vehículo "{vehicle.marca} {vehicle.modelo}" publicado exitosamente (Destino: {route_res.get("engine")}).')
+            else:
+                messages.warning(request, f'Vehículo guardado en SQLite local, pero {route_res.get("engine")} no estuvo accesible. Consulta el Historial Multi-BD.')
+
             return redirect('app_deportivos_guadalupe:car_showcase', car_id=vehicle.id)
     else:
         form = VehiculoForm()
-    return render(request, 'app_deportivos_guadalupe/car-create.html', {'form': form, 'editing': False})
+
+    db_status = get_database_status()
+    return render(request, 'app_deportivos_guadalupe/car-create.html', {
+        'form': form,
+        'editing': False,
+        'db_status': db_status,
+    })
 
 
 def car_edit_view(request, car_id):
@@ -67,15 +82,26 @@ def car_edit_view(request, car_id):
             urls_extra = [u.strip() for u in request.POST.getlist('imagenes_extra') if u.strip()]
             for orden, url in enumerate(urls_extra):
                 ImagenVehiculo.objects.create(vehiculo=vehicle, url=url, orden=orden)
+
+            target_engine = request.POST.get('target_engine', 'default')
+            route_res = save_vehicle_with_route(vehicle, target_engine, action='EDITAR')
+            if route_res.get('status') == 'success':
+                messages.success(request, f'Cambios guardados en "{vehicle.marca} {vehicle.modelo}" (Destino: {route_res.get("engine")}).')
+            else:
+                messages.warning(request, f'Cambios guardados en SQLite local, pero {route_res.get("engine")} no estuvo accesible. Consulta el Historial Multi-BD.')
+
             return redirect('app_deportivos_guadalupe:car_showcase', car_id=vehicle.id)
     else:
         form = VehiculoForm(instance=vehicle)
+
+    db_status = get_database_status()
     return render(request, 'app_deportivos_guadalupe/car-create.html', {
         'form': form,
         'editing': True,
         'vehicle': vehicle,
         'description_html': sanitize_description(vehicle.descripcion),
         'imagenes_extra': vehicle.imagenes.all(),
+        'db_status': db_status,
     })
 
 
@@ -89,6 +115,48 @@ def car_showcase_view(request, car_id):
         'description_html': sanitize_description(vehicle.descripcion),
     })
 
+
+@require_http_methods(['POST'])
+def car_sync_view(request, car_id):
+    vehicle = get_object_or_404(Vehiculo, pk=car_id)
+    results = replicate_vehicle_to_all(vehicle, accion='SINCRONIZAR')
+
+    exitosos = [k for k, v in results.items() if v]
+    fallidos = [k for k, v in results.items() if not v]
+
+    if not results:
+        messages.info(request, f'Solo SQLite local está activo en el entorno. Para sincronizar a la nube, configura tu .env con Neon, Aiven o Atlas.')
+    elif not fallidos:
+        messages.success(request, f'¡"{vehicle.marca} {vehicle.modelo}" replicado con éxito en todos los motores configurados: {", ".join(exitosos)}!')
+    elif exitosos:
+        messages.warning(request, f'Replicación parcial de "{vehicle.marca} {vehicle.modelo}". Conectados: {", ".join(exitosos)} | Fallos: {", ".join(fallidos)}')
+    else:
+        messages.error(request, f'No se pudo replicar en los motores en la nube: {", ".join(fallidos)}. Verifica las credenciales en .env.')
+
+    return redirect('app_deportivos_guadalupe:car_showcase', car_id=vehicle.id)
+
+
+def historial_auditoria_view(request):
+    registros = RegistroAuditoria.objects.all().order_by('-fecha')[:100]
+    db_status = get_database_status()
+    total_vehiculos = Vehiculo.objects.count()
+    return render(request, 'app_deportivos_guadalupe/historial-auditoria.html', {
+        'registros': registros,
+        'db_status': db_status,
+        'total_vehiculos': total_vehiculos,
+    })
+
+
+@require_http_methods(['POST'])
+def sync_all_catalog_view(request):
+    vehicles = Vehiculo.objects.all()
+    count = 0
+    for veh in vehicles:
+        replicate_vehicle_to_all(veh, accion='SINCRONIZAR')
+        count += 1
+
+    messages.success(request, f'Se inició la sincronización de los {count} vehículos del catálogo en todos los motores activos.')
+    return redirect('app_deportivos_guadalupe:historial_auditoria')
 
 
 def mapa_view(request):
@@ -213,11 +281,12 @@ def trayectoria_api(request, trayectoria_id):
     trayectoria.save()
     return JsonResponse(_trayectoria_data(trayectoria))
 
+
 def solicitudes_adicion_view(request):
     reportes = Reporte.objects.all()
 
     if request.method == 'POST':
-        form = ReporteForm(request.POST, request.FILES) #FILES Subidas
+        form = ReporteForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('app_deportivos_guadalupe:feat_soliadds')
@@ -228,6 +297,7 @@ def solicitudes_adicion_view(request):
         'form': form,
         'reportes': reportes,
     })
+
 
 def evacuacion(request):
     return redirect('app_deportivos_guadalupe:feat_map')

@@ -1,0 +1,402 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Cambios y Multi-BD | Deportivos Guadalupe</title>
+    <link rel="icon" href="{% static 'source/images/systems/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <style>
+        .audit-main {
+            width: min(1200px, calc(100% - 48px));
+            margin: 0 auto;
+            padding: 36px 0 80px;
+        }
+        .audit-heading {
+            margin-bottom: 32px;
+        }
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 36px;
+        }
+        .db-card {
+            background: linear-gradient(145deg, rgba(16, 43, 73, 0.85), rgba(7, 21, 37, 0.95));
+            border: 1px solid var(--ag-line, rgba(119, 187, 229, 0.24));
+            border-radius: 8px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(1, 8, 18, 0.35);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .db-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--ag-cyan, #61e4ff);
+        }
+        .db-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .db-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #edf8ff;
+        }
+        .db-card-icon {
+            font-size: 1.4rem;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        .pill-online {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.4);
+        }
+        .pill-offline {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+        }
+        .pill-unconfigured {
+            background: rgba(149, 165, 166, 0.15);
+            color: #bdc3c7;
+            border: 1px solid rgba(149, 165, 166, 0.3);
+        }
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .pulse-online {
+            background: #2ecc71;
+            box-shadow: 0 0 8px #2ecc71;
+        }
+        .pulse-offline {
+            background: #e74c3c;
+        }
+        .pulse-unconfigured {
+            background: #7f8c8d;
+        }
+        .db-card-meta {
+            font-size: 0.8rem;
+            color: var(--ag-muted, #9db9cc);
+            line-height: 1.5;
+            margin: 0;
+        }
+        .db-card-footer {
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(119, 187, 229, 0.12);
+            font-size: 0.72rem;
+            color: var(--ag-cyan, #61e4ff);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* Action Toolbar */
+        .audit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: rgba(12, 34, 58, 0.65);
+            border: 1px solid var(--ag-line, rgba(119, 187, 229, 0.24));
+            border-radius: 8px;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+        }
+        .toolbar-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #edf8ff;
+        }
+        .toolbar-stats strong {
+            color: var(--ag-cyan, #61e4ff);
+            font-size: 1.05rem;
+        }
+
+        /* Audit Table */
+        .audit-table-wrapper {
+            background: rgba(7, 21, 37, 0.85);
+            border: 1px solid var(--ag-line, rgba(119, 187, 229, 0.24));
+            border-radius: 8px;
+            overflow-x: auto;
+            box-shadow: 0 14px 40px rgba(1, 8, 18, 0.4);
+        }
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+        .audit-table th {
+            background: rgba(14, 38, 66, 0.95);
+            color: var(--ag-cyan, #61e4ff);
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--ag-line, rgba(119, 187, 229, 0.24));
+            white-space: nowrap;
+        }
+        .audit-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(119, 187, 229, 0.1);
+            color: #edf8ff;
+            vertical-align: middle;
+        }
+        .audit-table tr:hover td {
+            background: rgba(18, 48, 82, 0.35);
+        }
+        .badge-action {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .badge-crear { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.4); }
+        .badge-editar { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
+        .badge-sincronizar { background: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.4); }
+        .badge-eliminar { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-exitoso { color: #2ecc71; background: rgba(46, 204, 113, 0.12); }
+        .status-parcial { color: #f39c12; background: rgba(243, 156, 18, 0.12); }
+        .status-error { color: #e74c3c; background: rgba(231, 76, 60, 0.12); }
+        .status-local_solo { color: #61e4ff; background: rgba(97, 228, 255, 0.12); }
+
+        .vehicle-cell strong {
+            display: block;
+            color: #edf8ff;
+        }
+        .vehicle-uuid {
+            font-family: monospace;
+            font-size: 0.72rem;
+            color: var(--ag-muted, #9db9cc);
+        }
+        .details-cell {
+            max-width: 320px;
+            font-size: 0.8rem;
+            color: var(--ag-muted, #9db9cc);
+            line-height: 1.4;
+        }
+        .empty-history {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--ag-muted, #9db9cc);
+        }
+    </style>
+</head>
+<body class="ag-page catalog-page">
+    <header class="ag-header">
+        <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}">
+            <img src="{% static 'source/images/systems/favicon.ico' %}" alt="">
+            <span>Deportivos Guadalupe</span>
+        </a>
+        <nav class="ag-nav" aria-label="Navegación del historial">
+            <a href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Catálogo</a>
+            <a href="{% url 'app_deportivos_guadalupe:car_create' %}">Añadir vehículo</a>
+            <a href="{% url 'app_deportivos_guadalupe:garaje' %}">Garaje</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
+    </header>
+
+    <main class="ag-main audit-main">
+        <section class="audit-heading">
+            <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_catalog' %}">← Volver al catálogo</a>
+            <p class="ag-eyebrow">Arquitectura Multi-Motor / Centro de Sincronización</p>
+            <h1>Historial de cambios <span>y adiciones</span></h1>
+            <p>Monitoreo en tiempo real de transacciones, creaciones, ediciones y réplicas cruzadas entre la base de datos principal y las instancias en la nube.</p>
+        </section>
+
+        {% if messages %}
+            <div class="system-messages" style="margin-bottom: 24px;">
+                {% for message in messages %}
+                    <div class="ag-alert ag-alert-{{ message.tags }}" style="padding: 14px 20px; border-radius: 6px; margin-bottom: 12px; border: 1px solid var(--ag-cyan, #61e4ff); background: rgba(97, 228, 255, 0.08); color: #edf8ff; font-size: 0.95rem;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Tarjetas de Estado de los Motores -->
+        <section class="db-grid" aria-label="Estado de los motores de bases de datos">
+            <!-- 1. SQLite -->
+            <div class="db-card">
+                <div class="db-card-header">
+                    <div class="db-card-title">
+                        <span class="db-card-icon">💾</span>
+                        <span>SQLite (Local)</span>
+                    </div>
+                    <span class="status-pill pill-online">
+                        <span class="pulse-dot pulse-online"></span> En línea
+                    </span>
+                </div>
+                <p class="db-card-meta">Base de datos local persistente (db.sqlite3). Motor principal del servidor.</p>
+                <div class="db-card-footer">Driver: sqlite3 nativo</div>
+            </div>
+
+            <!-- 2. PostgreSQL Neon -->
+            <div class="db-card">
+                <div class="db-card-header">
+                    <div class="db-card-title">
+                        <span class="db-card-icon">🐘</span>
+                        <span>PostgreSQL</span>
+                    </div>
+                    {% if db_status.postgres.online %}
+                        <span class="status-pill pill-online"><span class="pulse-dot pulse-online"></span> En línea</span>
+                    {% elif db_status.postgres.configured %}
+                        <span class="status-pill pill-offline"><span class="pulse-dot pulse-offline"></span> Error Conexión</span>
+                    {% else %}
+                        <span class="status-pill pill-unconfigured"><span class="pulse-dot pulse-unconfigured"></span> Sin .env</span>
+                    {% endif %}
+                </div>
+                <p class="db-card-meta">Instancia Neon.tech en la nube (AWS US-East-2). Sincronización relacional con SSL.</p>
+                <div class="db-card-footer">Driver: psycopg v3 (Neon Cloud)</div>
+            </div>
+
+            <!-- 3. MySQL Aiven -->
+            <div class="db-card">
+                <div class="db-card-header">
+                    <div class="db-card-title">
+                        <span class="db-card-icon">🐬</span>
+                        <span>MySQL</span>
+                    </div>
+                    {% if db_status.mysql.online %}
+                        <span class="status-pill pill-online"><span class="pulse-dot pulse-online"></span> En línea</span>
+                    {% elif db_status.mysql.configured %}
+                        <span class="status-pill pill-offline"><span class="pulse-dot pulse-offline"></span> Error Conexión</span>
+                    {% else %}
+                        <span class="status-pill pill-unconfigured"><span class="pulse-dot pulse-unconfigured"></span> Sin .env</span>
+                    {% endif %}
+                </div>
+                <p class="db-card-meta">Instancia Aiven.io Cloud administrada. Tablas idénticas mapeadas vía PyMySQL.</p>
+                <div class="db-card-footer">Driver: pymysql (Aiven Cloud)</div>
+            </div>
+
+            <!-- 4. MongoDB Atlas -->
+            <div class="db-card">
+                <div class="db-card-header">
+                    <div class="db-card-title">
+                        <span class="db-card-icon">🍃</span>
+                        <span>MongoDB Atlas</span>
+                    </div>
+                    {% if db_status.mongodb.online %}
+                        <span class="status-pill pill-online"><span class="pulse-dot pulse-online"></span> En línea</span>
+                    {% elif db_status.mongodb.configured %}
+                        <span class="status-pill pill-offline"><span class="pulse-dot pulse-offline"></span> Error Conexión</span>
+                    {% else %}
+                        <span class="status-pill pill-unconfigured"><span class="pulse-dot pulse-unconfigured"></span> Sin .env</span>
+                    {% endif %}
+                </div>
+                <p class="db-card-meta">Cluster documental NoSQL M0 en Atlas. Documentos JSON upsertados por UUID.</p>
+                <div class="db-card-footer">Driver: pymongo (Cluster Cloud)</div>
+            </div>
+        </section>
+
+        <!-- Barra de Herramientas y Acciones -->
+        <section class="audit-toolbar">
+            <div class="toolbar-stats">
+                <div>Total en Catálogo: <strong>{{ total_vehiculos }}</strong></div>
+                <div>Registros de Auditoría: <strong>{{ registros|length }}</strong></div>
+            </div>
+            <form method="post" action="{% url 'app_deportivos_guadalupe:sync_all_catalog' %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="ag-button ag-button-small" title="Replicar todo el catálogo local en los motores en la nube">
+                    ⚡ Sincronizar catálogo completo en todas las BDs
+                </button>
+            </form>
+        </section>
+
+        <!-- Tabla de Registros de Auditoría -->
+        <section class="audit-table-wrapper" aria-label="Tabla de auditoría de cambios">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Fecha / Hora</th>
+                        <th>Acción</th>
+                        <th>Vehículo</th>
+                        <th>Origen ➔ Destino</th>
+                        <th>Estado</th>
+                        <th>Detalles del proceso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registros %}
+                        <tr>
+                            <td style="white-space: nowrap; font-size: 0.8rem; color: var(--ag-muted, #9db9cc);">
+                                {{ reg.fecha|date:"Y-m-d H:i:s" }}
+                            </td>
+                            <td>
+                                <span class="badge-action badge-{{ reg.accion|lower }}">{{ reg.accion }}</span>
+                            </td>
+                            <td class="vehicle-cell">
+                                <strong>{{ reg.vehiculo_nombre }}</strong>
+                                {% if reg.vehiculo_uuid %}
+                                    <span class="vehicle-uuid">{{ reg.vehiculo_uuid|slice:":8" }}...</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.82rem;">
+                                <span>{{ reg.motor_origen }}</span> ➔ <strong style="color: var(--ag-cyan, #61e4ff);">{{ reg.motor_destino }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge-status status-{{ reg.estado|lower }}">
+                                    {% if reg.estado == 'EXITOSO' %}● Éxito
+                                    {% elif reg.estado == 'PARCIAL' %}▲ Parcial
+                                    {% elif reg.estado == 'ERROR' %}✕ Fallo
+                                    {% else %}💾 Solo Local{% endif %}
+                                </span>
+                            </td>
+                            <td class="details-cell">
+                                {{ reg.detalles }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-history">
+                                <h3>Sin registros de auditoría aún</h3>
+                                <p>Crea, edita o sincroniza un vehículo para comenzar a generar trazabilidad multi-base de datos.</p>
+                                <a href="{% url 'app_deportivos_guadalupe:car_create' %}" class="ag-button ag-button-small" style="margin-top: 14px;">+ Añadir Vehículo</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

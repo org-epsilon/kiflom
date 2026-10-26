@@ -12,9 +12,23 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+import dj_database_url
+
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cargar variables de entorno desde .env si existe (local o en Render)
+load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / '.env.deportivos_guadalupe')
+load_dotenv(BASE_DIR.parent / '.env')
+load_dotenv(BASE_DIR.parent / '.env.deportivos_guadalupe')
 
 
 # Quick-start development settings - unsuitable for production
@@ -87,6 +101,33 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# PostgreSQL (Neon / Cloud)
+database_url_postgres = os.environ.get('DATABASE_URL_POSTGRES')
+if database_url_postgres:
+    DATABASES['postgres'] = dj_database_url.parse(
+        database_url_postgres,
+        conn_max_age=600,
+        ssl_require=True,
+    )
+
+# MySQL (Aiven / Cloud)
+database_url_mysql = os.environ.get('DATABASE_URL_MYSQL')
+if database_url_mysql:
+    mysql_conf = dj_database_url.parse(
+        database_url_mysql,
+        conn_max_age=600,
+    )
+    options = mysql_conf.get('OPTIONS', {})
+    if 'ssl-mode' in options:
+        options.pop('ssl-mode')
+        options['ssl'] = {'check_hostname': False}
+    mysql_conf['OPTIONS'] = options
+    DATABASES['mysql'] = mysql_conf
+
+# MongoDB (Atlas / Cloud)
+MONGODB_URI = os.environ.get('MONGODB_URI', '')
+MONGODB_NAME = os.environ.get('MONGODB_NAME', 'deportivos_guadalupe')
 
 
 # Password validation

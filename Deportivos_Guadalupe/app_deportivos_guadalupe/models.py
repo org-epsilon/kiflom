@@ -1,11 +1,10 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 
-# Create your models here.
 class Reporte(models.Model):
     nombre      = models.CharField(max_length=100)
     descripcion = models.TextField()
-    #Cada tipo de arhivo va a su subcarpeta dentro de 'media/'
     foto        = models.ImageField(upload_to='reports/images/')
     documento   = models.FileField(upload_to='reports/docs/')
     audio       = models.FileField(upload_to='reports/audios/')
@@ -54,6 +53,7 @@ class Trayectoria(models.Model):
 
 
 class Vehiculo(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     marca = models.CharField(max_length=80)
     modelo = models.CharField(max_length=120)
     precio = models.DecimalField(max_digits=12, decimal_places=2)
@@ -93,4 +93,30 @@ class ImagenVehiculo(models.Model):
         ordering = ['orden', 'id']
 
     def __str__(self):
-        return f'Imagen {self.orden} de {self.vehiculo}'
+        return f'Imagen {self.orden} de {self.vehiculo}'
+
+
+class RegistroAuditoria(models.Model):
+    ACCIONES = [
+        ('CREAR', 'Creación'),
+        ('EDITAR', 'Edición'),
+        ('SINCRONIZAR', 'Sincronización'),
+        ('ELIMINAR', 'Eliminación'),
+    ]
+
+    fecha = models.DateTimeField(auto_now_add=True)
+    accion = models.CharField(max_length=20, choices=ACCIONES)
+    vehiculo_uuid = models.CharField(max_length=64, blank=True)
+    vehiculo_nombre = models.CharField(max_length=150)
+    motor_origen = models.CharField(max_length=50)
+    motor_destino = models.CharField(max_length=150, blank=True)
+    estado = models.CharField(max_length=20, default='EXITOSO')
+    detalles = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Registro de Auditoría'
+        verbose_name_plural = 'Registros de Auditoría'
+
+    def __str__(self):
+        return f'[{self.fecha.strftime("%Y-%m-%d %H:%M")}] {self.accion} - {self.vehiculo_nombre} ({self.motor_origen})'

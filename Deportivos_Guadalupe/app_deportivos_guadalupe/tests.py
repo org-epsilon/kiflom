@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Vehiculo
+from .models import Vehiculo, RegistroAuditoria
 
 
 class VehiculoCatalogoTests(TestCase):
@@ -224,7 +224,6 @@ class VehiculoCatalogoTests(TestCase):
         self.assertContains(showcase, 'https://example.com/mclaren-interior.jpg')
         self.assertEqual(len(showcase.context['imagenes_galeria']), 2)
 
-
         # 3. Editar vehículo y actualizar imágenes extra
         edit_response = self.client.post(
             reverse('app_deportivos_guadalupe:car_edit', args=[vehicle.id]),
@@ -246,3 +245,86 @@ class VehiculoCatalogoTests(TestCase):
         self.assertEqual(vehicle.imagenes.count(), 1)
         self.assertEqual(vehicle.imagenes.first().url, 'https://example.com/mclaren-rear.jpg')
 
+    def test_historial_auditoria_page_renders_successfully(self):
+        response = self.client.get(reverse('app_deportivos_guadalupe:historial_auditoria'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Historial de cambios')
+        self.assertContains(response, 'SQLite (Local)')
+        self.assertContains(response, 'PostgreSQL')
+        self.assertContains(response, 'MySQL')
+        self.assertContains(response, 'MongoDB Atlas')
+
+    def test_create_vehicle_records_audit_log(self):
+        response = self.client.post(
+            reverse('app_deportivos_guadalupe:car_create'),
+            {
+                'marca': 'Aston Martin',
+                'modelo': 'DBS Superleggera',
+                'precio': '330000',
+                'anio': '2024',
+                'stock': '1',
+                'sillas': '2',
+                'puertas': '2',
+                'imagen_url': 'https://example.com/aston.jpg',
+                'target_engine': 'default',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        vehicle = Vehiculo.objects.get(marca='Aston Martin', modelo='DBS Superleggera')
+        registro = RegistroAuditoria.objects.filter(vehiculo_uuid=str(vehicle.uuid)).first()
+        self.assertIsNotNone(registro)
+        self.assertEqual(registro.accion, 'CREAR')
+        self.assertEqual(registro.motor_destino, 'SQLite (Local)')
+        self.assertEqual(registro.estado, 'EXITOSO')
+
+    def test_edit_vehicle_records_audit_log(self):
+        response = self.client.post(
+            reverse('app_deportivos_guadalupe:car_edit', args=[self.vehicle.id]),
+            {
+                'marca': 'Nissan',
+                'modelo': 'GT-R Nismo Modificado',
+                'precio': '220000',
+                'anio': '2024',
+                'stock': '1',
+                'sillas': '2',
+                'puertas': '2',
+                'imagen_url': 'https://example.com/nissan.jpg',
+                'target_engine': 'default',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        registro = RegistroAuditoria.objects.filter(
+            vehiculo_uuid=str(self.vehicle.uuid),
+            accion='EDITAR',
+        ).first()
+        self.assertIsNotNone(registro)
+        self.assertEqual(registro.estado, 'EXITOSO')
+
+    def test_car_sync_endpoint_replicates_and_logs(self):
+        response = self.client.post(
+            reverse('app_deportivos_guadalupe:car_sync', args=[self.vehicle.id])
+        )
+        self.assertRedirects(
+            response,
+            reverse('app_deportivos_guadalupe:car_showcase', args=[self.vehicle.id]),
+        )
+        registro = RegistroAuditoria.objects.filter(
+            vehiculo_uuid=str(self.vehicle.uuid),
+            accion='SINCRONIZAR',
+        ).first()
+        self.assertIsNotNone(registro)
+        self.assertEqual(registro.estado, 'LOCAL_SOLO')
+
+    def test_sync_all_catalog_endpoint(self):
+        response = self.client.post(
+            reverse('app_deportivos_guadalupe:sync_all_catalog')
+        )
+        self.assertRedirects(
+            response,
+            reverse('app_deportivos_guadalupe:historial_auditoria'),
+        )
+        registro = RegistroAuditoria.objects.filter(
+            vehiculo_uuid=str(self.vehicle.uuid),
+            accion='SINCRONIZAR',
+        ).first()
+        self.assertIsNotNone(registro)

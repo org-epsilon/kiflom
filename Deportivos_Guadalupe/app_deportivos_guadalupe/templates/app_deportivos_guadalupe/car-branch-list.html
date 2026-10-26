@@ -16,18 +16,20 @@
         </a>
         <nav class="ag-nav" aria-label="Navegación del catálogo">
             <a href="{% url 'app_deportivos_guadalupe:garaje' %}">Garaje</a>
+            <a href="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">Historial Multi-BD</a>
             <a href="{% url 'home' %}">Salir</a>
         </nav>
     </header>
 
     <main class="ag-main catalog-main">
         <section class="catalog-heading">
-            <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:garaje' %}">← Volver al catálogo</a>
+            <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:garaje' %}">← Volver al garaje</a>
             <p class="ag-eyebrow">Catálogo / {{ brand }}</p>
             <h1>{% if all_vehicles %}Todos los <span>vehículos</span>{% else %}Modelos <span>{{ brand }}</span>{% endif %}</h1>
             <p>Explora la selección disponible y entra en cada ficha para conocer sus especificaciones, rendimiento y experiencia visual.</p>
             <div class="catalog-actions">
                 <a class="ag-button ag-button-small" href="{% url 'app_deportivos_guadalupe:car_create' %}">Añadir</a>
+                <a class="ag-button ag-button-small" style="background: rgba(12, 34, 58, 0.65); border: 1px solid var(--ag-cyan, #61e4ff); color: var(--ag-cyan, #61e4ff);" href="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">Historial Multi-BD</a>
                 {% if not all_vehicles %}<a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Ver todos los vehículos</a>{% endif %}
             </div>
         </section>

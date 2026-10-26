@@ -10,6 +10,9 @@ urlpatterns = [
     path('garaje/marca/<slug:brand_slug>/', views.car_branch_list_view, name='car_branch_list'),
     path('garaje/vehiculo/<int:car_id>/', views.car_showcase_view, name='car_showcase'),
     path('garaje/vehiculo/<int:car_id>/editar/', views.car_edit_view, name='car_edit'),
+    path('garaje/vehiculo/<int:car_id>/sincronizar/', views.car_sync_view, name='car_sync'),
+    path('garaje/historial/', views.historial_auditoria_view, name='historial_auditoria'),
+    path('garaje/historial/sincronizar-todo/', views.sync_all_catalog_view, name='sync_all_catalog'),
     path('garaje/anadir/', views.car_create_view, name='car_create'),
 
     path('feat-map/', views.mapa_view, name='feat_map'),

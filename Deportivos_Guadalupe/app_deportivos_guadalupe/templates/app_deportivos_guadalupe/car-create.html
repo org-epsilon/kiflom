@@ -11,7 +11,11 @@
 <body class="ag-page catalog-page">
     <header class="ag-header">
         <a class="ag-nav-brand" href="{% url 'app_deportivos_guadalupe:garaje' %}"><img src="{% static 'source/images/systems/favicon.ico' %}" alt=""><span>Deportivos Guadalupe</span></a>
-        <nav class="ag-nav" aria-label="Navegación de alta"><a href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Catálogo</a><a href="{% url 'home' %}">Salir</a></nav>
+        <nav class="ag-nav" aria-label="Navegación de alta">
+            <a href="{% url 'app_deportivos_guadalupe:car_catalog' %}">Catálogo</a>
+            <a href="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">Historial Multi-BD</a>
+            <a href="{% url 'home' %}">Salir</a>
+        </nav>
     </header>
     <main class="ag-main create-main">
         <section class="catalog-heading">
@@ -20,9 +24,61 @@
             <h1>{% if editing %}Editar <span>vehículo</span>{% else %}Añadir <span>vehículo</span>{% endif %}</h1>
             <p>{% if editing %}Actualiza cualquier dato, medio o especificación de esta ficha.{% else %}Completa la ficha para publicar un nuevo deportivo en el catálogo. Puedes usar archivos locales o enlaces externos.{% endif %}</p>
         </section>
+
+        {% if messages %}
+            <div class="system-messages" style="margin-bottom: 24px;">
+                {% for message in messages %}
+                    <div class="ag-alert ag-alert-{{ message.tags }}" style="padding: 14px 20px; border-radius: 6px; margin-bottom: 12px; border: 1px solid var(--ag-cyan, #61e4ff); background: rgba(97, 228, 255, 0.08); color: #edf8ff; font-size: 0.95rem;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <form class="vehicle-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+            <fieldset class="target-engine-fieldset" style="border-color: rgba(97, 228, 255, 0.35); background: rgba(6, 18, 33, 0.7);">
+                <legend style="color: var(--ag-cyan, #61e4ff); font-weight: 700;">Destino y Motor de Base de Datos</legend>
+                <p class="form-note" style="margin-bottom: 14px;">
+                    Selecciona en qué motor de base de datos deseas registrar o replicar este vehículo:
+                </p>
+                <div class="form-grid form-grid-two">
+                    <label>
+                        Motor de Base de Datos
+                        <select name="target_engine" id="target_engine" class="target-engine-select" style="width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--ag-line, rgba(119, 187, 229, 0.24)); border-radius: 4px; background: rgba(3, 15, 28, 0.75); color: #edf8ff; font-family: inherit; font-size: 0.95rem;">
+                            <option value="default" selected>💾 SQLite (Local por defecto)</option>
+                            <option value="postgres">🐘 PostgreSQL (Neon Cloud){% if not db_status.postgres.online %} [Desconectado / Sin credenciales]{% else %} [🟢 En línea]{% endif %}</option>
+                            <option value="mysql">🐬 MySQL (Aiven Cloud){% if not db_status.mysql.online %} [Desconectado / Sin credenciales]{% else %} [🟢 En línea]{% endif %}</option>
+                            <option value="mongodb">🍃 MongoDB (Atlas Cloud){% if not db_status.mongodb.online %} [Desconectado / Sin credenciales]{% else %} [🟢 En línea]{% endif %}</option>
+                            <option value="all">⚡ Replicar a todas las BDs (Sincronización multi-motor)</option>
+                        </select>
+                    </label>
+                    <div class="db-status-mini-box" style="display: flex; flex-direction: column; justify-content: center; gap: 8px; background: rgba(5, 18, 33, 0.55); border: 1px solid rgba(119, 187, 229, 0.2); border-radius: 6px; padding: 12px 16px;">
+                        <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ag-cyan, #61e4ff); font-weight: 700;">Estado de motores disponibles</span>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.78rem;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {% if db_status.default.online %}#2ecc71; box-shadow: 0 0 6px #2ecc71;{% else %}#e74c3c;{% endif %}"></span>
+                                SQLite
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {% if db_status.postgres.online %}#2ecc71; box-shadow: 0 0 6px #2ecc71;{% else %}#7f8c8d;{% endif %}"></span>
+                                Neon Postgres
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {% if db_status.mysql.online %}#2ecc71; box-shadow: 0 0 6px #2ecc71;{% else %}#7f8c8d;{% endif %}"></span>
+                                Aiven MySQL
+                            </span>
+                            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {% if db_status.mongodb.online %}#2ecc71; box-shadow: 0 0 6px #2ecc71;{% else %}#7f8c8d;{% endif %}"></span>
+                                Mongo Atlas
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
             <fieldset><legend>Identidad y disponibilidad</legend>
                 <div class="form-grid form-grid-three">
                     <label>{{ form.marca.label }}{{ form.marca }}{{ form.marca.errors }}</label>
@@ -157,6 +213,3 @@
     </script>
 </body>
 </html>
-
-
-{% comment %} EL pollo Arfiente {% endcomment %}

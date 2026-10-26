@@ -174,6 +174,7 @@
             <span>Deportivos Guadalupe</span>
         </a>
         <nav class="ag-nav" aria-label="Navegación del vehículo">
+            <a href="{% url 'app_deportivos_guadalupe:historial_auditoria' %}">Historial Multi-BD</a>
             <a href="{% url 'app_deportivos_guadalupe:car_edit' vehicle.id %}">Editar</a>
             <a href="{% url 'app_deportivos_guadalupe:car_branch_list' vehicle.marca|slugify %}">Más {{ vehicle.marca }}</a>
             <a href="{% url 'home' %}">Salir</a>
@@ -182,11 +183,30 @@
 
     <main class="ag-main showcase-main">
         <a class="ag-text-link" href="{% url 'app_deportivos_guadalupe:car_branch_list' vehicle.marca|slugify %}">← Volver a {{ vehicle.marca }}</a>
+
+        {% if messages %}
+            <div class="system-messages" style="margin: 18px 0; width: 100%;">
+                {% for message in messages %}
+                    <div class="ag-alert ag-alert-{{ message.tags }}" style="padding: 14px 20px; border-radius: 6px; margin-bottom: 12px; border: 1px solid var(--ag-cyan, #61e4ff); background: rgba(97, 228, 255, 0.08); color: #edf8ff; font-size: 0.95rem;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <section class="showcase-hero">
             <div class="showcase-heading">
                 <p class="ag-eyebrow">{{ vehicle.marca }} / {{ vehicle.anio }}</p>
                 <h1>{{ vehicle.modelo }}</h1>
-                <p class="showcase-price"><span>Precio:</span> ${{ vehicle.precio|thousands_dot }} <small>USD</small></p>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-top: 10px;">
+                    <p class="showcase-price" style="margin: 0;"><span>Precio:</span> ${{ vehicle.precio|thousands_dot }} <small>USD</small></p>
+                    <form method="post" action="{% url 'app_deportivos_guadalupe:car_sync' vehicle.id %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="ag-button ag-button-small" style="font-size: 0.76rem; letter-spacing: 0.08em;" title="Replicar este vehículo a PostgreSQL, MySQL y MongoDB">
+                            ⚡ Replicar a todas las BDs
+                        </button>
+                    </form>
+                </div>
             </div>
             <div class="showcase-media">
                 {% if vehicle.imagen_archivo %}<img src="{{ vehicle.imagen_archivo.url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}">{% elif vehicle.imagen_url %}<img src="{{ vehicle.imagen_url }}" alt="{{ vehicle.marca }} {{ vehicle.modelo }}">{% endif %}
